@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kubearmor
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kubearmor
+  namespace: kubearmor
+  labels:
+    kubearmor-app: kubearmor
+spec:
+  selector:
+    matchLabels:
+      kubearmor-app: kubearmor
+  template:
+    metadata:
+      annotations:
+        container.apparmor.security.beta.kubernetes.io/kubearmor: unconfined
+      labels:
+        kubearmor-app: kubearmor
+    spec:
+      hostNetwork: true
+      hostPID: true
+      containers:
+      - name: kubearmor
+        image: kubearmor/kubearmor:stable
+        imagePullPolicy: Always
+        args:
+        - -gRPC=32767
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: etc-apparmor-d
+          mountPath: /etc/apparmor.d
+        - name: lib-apparmor-d
+          mountPath: /lib/apparmor.d
+        - name: usr-lib-apparmor-d
+          mountPath: /usr/lib/apparmor.d
+        - name: apparmor-fs
+          mountPath: /sys/kernel/security/apparmor
+        - name: bpf-fs
+          mountPath: /sys/fs/bpf
+        - name: procfs
+          mountPath: /proc
+        - name: sysfs
+          mountPath: /sys
+        - name: os-release
+          mountPath: /etc/os-release
+          readOnly: true
+        - name: kernel-src
+          mountPath: /usr/src
+          readOnly: true
+        - name: kernel-header
+          mountPath: /lib/modules
+          readOnly: true
+      volumes:
+      - name: etc-apparmor-d
+        hostPath:
+          path: /etc/apparmor.d
+      - name: lib-apparmor-d
+        hostPath:
+          path: /lib/apparmor.d
+      - name: usr-lib-apparmor-d
+        hostPath:
+          path: /usr/lib/apparmor.d
+      - name: apparmor-fs
+        hostPath:
+          path: /sys/kernel/security/apparmor
+      - name: bpf-fs
+        hostPath:
+          path: /sys/fs/bpf
+      - name: procfs
+        hostPath:
+          path: /proc
+      - name: sysfs
+        hostPath:
+          path: /sys
+      - name: os-release
+        hostPath:
+          path: /etc/os-release
+      - name: kernel-src
+        hostPath:
+          path: /usr/src
+      - name: kernel-header
+        hostPath:
+          path: /lib/modules
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      - effect: NoExecute
+        operator: Exists

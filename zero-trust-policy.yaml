@@ -1,0 +1,33 @@
+apiVersion: security.kubearmor.com/v1
+kind: KubeArmorPolicy
+metadata:
+  name: zero-trust-nginx-policy
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: nginx-test
+  action: Block
+  severity: 5
+  message: "Zero-trust policy violation detected"
+  
+  # Block shell access
+  process:
+    matchPaths:
+    - path: /bin/bash
+    - path: /bin/sh
+    - path: /bin/ash
+  
+  # Block network tools
+  process:
+    matchPaths:
+    - path: /usr/bin/curl
+    - path: /usr/bin/wget
+    - path: /usr/bin/nc
+  
+  # Block sensitive file access
+  file:
+    matchPaths:
+    - path: /etc/passwd
+    - path: /etc/shadow
+    - path: /root/*
