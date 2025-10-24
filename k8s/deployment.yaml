@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: wisecow
-        image: YOUR_DOCKERHUB_USERNAME/wisecow:latest
+        image: harshad41/wisecow:latest  # ← Change this line
         ports:
         - containerPort: 3000
         env:
