@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline - Simple
 
 on:
   push:
@@ -9,7 +9,7 @@ env:
   IMAGE_NAME: harshad41/wisecow
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
     
     steps:
@@ -31,30 +31,8 @@ jobs:
         context: .
         push: true
         tags: ${{ env.IMAGE_NAME }}:latest,${{ env.IMAGE_NAME }}:${{ github.sha }}
-        cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:latest
-        cache-to: type=inline
 
-  deploy:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Kubernetes tools
-      uses: azure/setup-kubectl@v3
-      with:
-        version: 'latest'
-
-    - name: Configure Kubernetes context
+    - name: Deploy Notification
       run: |
-        mkdir -p ~/.kube
-        echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
-        kubectl config use-context minikube
-
-    - name: Deploy to Kubernetes
-      run: |
-        kubectl apply -f k8s/
-        kubectl rollout status deployment/wisecow-deployment --timeout=300s
-        kubectl get all
+        echo "Docker image built and pushed successfully!"
+        echo "Manual deployment required: kubectl apply -f k8s/"
