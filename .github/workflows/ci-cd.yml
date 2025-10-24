@@ -42,7 +42,7 @@ jobs:
         chmod +x scripts/application_health_checker.sh
         ./scripts/application_health_checker.sh
     - name: System Health Check
-        run: |
+      run: |
           chmod +x scripts/system_health_monitor.sh
          ./scripts/system_health_monitor.sh
          
