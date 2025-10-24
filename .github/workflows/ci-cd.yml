@@ -40,11 +40,11 @@ jobs:
     - name: Health Check
       run: |
         chmod +x scripts/application_health_checker.sh
-        ./scripts/application_health_checker.sh
+            ./scripts/application_health_checker.sh
     - name: System Health Check
       run: |
           chmod +x scripts/system_health_monitor.sh
-         ./scripts/system_health_monitor.sh
+            ./scripts/system_health_monitor.sh
          
     - name: Log Analysis
       run: |
