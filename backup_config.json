@@ -1,0 +1,21 @@
+{
+  "backup_sources": [
+    "./test_documents",
+    "./test_projects"
+  ],
+  "backup_destinations": [
+    "./backups"
+  ],
+  "compression": "tar.gz",
+  "encryption": false,
+  "encryption_key": "your-secret-key-here",
+  "retention_days": 7,
+  "exclude_patterns": [
+    ".tmp",
+    ".log",
+    ".cache",
+    "node_modules"
+  ],
+  "notify_email": null,
+  "cloud_storage": null
+}

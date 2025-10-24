@@ -36,3 +36,17 @@ jobs:
       run: |
         echo "Docker image built and pushed successfully!"
         echo "Manual deployment required: kubectl apply -f k8s/"
+
+    - name: Health Check
+      run: |
+        chmod +x scripts/application_health_checker.sh
+        ./scripts/application_health_checker.sh
+    - name: System Health Check
+        run: |
+          chmod +x scripts/system_health_monitor.sh
+         ./scripts/system_health_monitor.sh
+         
+    - name: Log Analysis
+      run: |
+         python scripts/log_analyzer.py --sample
+         # Or use actual log files if available in CI
