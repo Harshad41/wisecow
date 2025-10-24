@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/wisecow
+  IMAGE_NAME: harshad41/wisecow
 
 jobs:
   build-and-push:
@@ -30,7 +30,7 @@ jobs:
       with:
         context: .
         push: true
-        tags: ${{ env.IMAGE_NAME }}:latest
+        tags: ${{ env.IMAGE_NAME }}:latest,${{ env.IMAGE_NAME }}:${{ github.sha }}
         cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:latest
         cache-to: type=inline
 
@@ -44,9 +44,12 @@ jobs:
 
     - name: Set up Kubernetes context
       uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
 
     - name: Deploy to Kubernetes
       run: |
         kubectl apply -f k8s/
+        kubectl rollout status deployment/wisecow-deployment
       env:
         KUBECONFIG: ${{ secrets.KUBECONFIG }}
