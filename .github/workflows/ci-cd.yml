@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/wisecow
+  IMAGE_NAME: harshad41/wisecow
 
 jobs:
   build-and-push:
@@ -34,25 +34,27 @@ jobs:
         cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:latest
         cache-to: type=inline
 
-  # For now, let's skip deployment in CI/CD until we set up a proper K8s cluster
-  # We'll manually deploy for this project
-  test-deployment:
+  deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
-    if: success()
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Minikube for testing
-      uses: medyagh/setup-minikube@v2
+    - name: Set up Kubernetes tools
+      uses: azure/setup-kubectl@v3
       with:
-        driver: docker
+        version: 'latest'
 
-    - name: Test Kubernetes manifests
+    - name: Configure Kubernetes context
       run: |
-        # Validate manifests without applying
-        kubectl apply --dry-run=client -f k8s/deployment.yaml
-        kubectl apply --dry-run=client -f k8s/tls-setup.yaml
-        echo "Kubernetes manifests are valid!"
+        mkdir -p ~/.kube
+        echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+        kubectl config use-context minikube
+
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -f k8s/
+        kubectl rollout status deployment/wisecow-deployment --timeout=300s
+        kubectl get all
